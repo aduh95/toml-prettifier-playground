@@ -1,5 +1,4 @@
 import prettify from "./prettify.js";
-import highlight from "./highlight.js";
 
 const getSelectedLine = (value, selectionStart, selectionEnd) =>
   value.substring(
@@ -62,6 +61,8 @@ async function* getUserInput() {
   let previousSelection;
   let buffer = "";
   let prettifier, terminatePrettifier;
+  const output = document.createElement("output");
+  document.body.append(output);
   for await (const event of getUserInput()) {
     let { data, inputType, target: textarea } = event;
     console.log(event);
@@ -78,9 +79,8 @@ async function* getUserInput() {
           terminatePrettifier = (await prettifier.next()).value;
         }
         const { done, value } = await prettifier.next(buffer);
-        // prettify(buffer).then(console.log);
         if (done) throw new Error("cannot prettify");
-        console.log(buffer, value, await highlight(value.data));
+        output.innerHTML += value.data + "\n";
         buffer = "";
         break;
     }

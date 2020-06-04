@@ -1,33 +1,7 @@
-let worker;
-const solvePromises = [];
-const rejectPromises = [];
-let idCounter = 0;
+import hljs from "highlight.js/lib/core.js";
+import toml from "highlight.js/lib/languages/ini.js";
 
-function reject(reason) {
-  for (const reject of rejectPromises) {
-    reject(reason);
-  }
-  worker = null;
-}
+const TOML = "toml";
+hljs.registerLanguage(TOML, toml);
 
-function getWorker() {
-  if (!worker) {
-    worker = new Worker("./highlight.worker.js");
-    worker.onmessage = (event) => {
-      const { id, value } = event.data;
-      solvePromises[id]?.(value);
-    };
-    worker.onerror = reject;
-    worker.onmessageerror = reject;
-  }
-  return worker;
-}
-
-export default function hightlight(code) {
-  const id = idCounter++;
-  return new Promise((resolve, reject) => {
-    solvePromises[id] = resolve;
-    rejectPromises[id] = reject;
-    getWorker().postMessage({ id, code });
-  });
-}
+export default (code) => hljs.highlight(TOML, code).value;

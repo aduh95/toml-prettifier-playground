@@ -1,6 +1,8 @@
 import TOMLPrettifier from "@aduh95/toml-prettifier";
 import initTOML from "@aduh95/toml";
 
+import highlight from "./highlight.js";
+
 const waitingMessages = [];
 function waitForInit(event) {
   waitingMessages.push(event.data);
@@ -29,7 +31,7 @@ const userInput = getUserInput();
 initTOML()
   .then(async () => {
     for await (const line of TOMLPrettifier(userInput)) {
-      postMessage(line);
+      postMessage(highlight(line));
     }
 
     close();
