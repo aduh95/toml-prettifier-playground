@@ -61,7 +61,7 @@ new ReadableStream({
           const { value, selectionStart } = textarea;
           controller.enqueue(
             value.substring(
-              Math.max(0, value.lastIndexOf("\n", selectionStart - 2)),
+              value.lastIndexOf("\n", selectionStart - 2) + 1,
               value.length - 1
             )
           );
