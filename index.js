@@ -40,49 +40,44 @@ const getCurrentTOMLExpression = ({ value, selectionStart }) => {
   }
 };
 
-async function* getUserInput() {
-  const input = document.createElement("textarea");
-  input.autofocus = true;
-
-  document.body.append(input);
-  const stream = new ReadableStream({
-    start(controller) {
-      input.addEventListener("input", (event) => controller.enqueue(event));
-    },
-  }).getReader();
-  while (true) {
-    const { done, value } = await stream.read();
-    if (done) return;
-    yield value;
-  }
-}
-
-(async () => {
-  let previousSelection;
-  let buffer = "";
-  let prettifier, terminatePrettifier;
-  const output = document.createElement("output");
-  document.body.append(output);
-  for await (const event of getUserInput()) {
-    let { data, inputType, target: textarea } = event;
-    console.log(event);
-    if (inputType === "insertText" && data === null) {
-      inputType = "insertLineBreak";
-    }
-    switch (inputType) {
-      case "insertText":
-        buffer += data;
-        break;
-      case "insertLineBreak":
-        if (!prettifier) {
-          prettifier = prettify();
-          terminatePrettifier = (await prettifier.next()).value;
+new ReadableStream({
+  start(controller) {
+    const input = document.createElement("textarea");
+    input.autofocus = true;
+    input.addEventListener("input", (event) => controller.enqueue(event));
+    document.body.append(input);
+  },
+})
+  .pipeThrough(
+    new TransformStream({
+      start() {},
+      transform(event, controller) {
+        const { data, inputType, target: textarea } = event;
+        console.log(event);
+        if (
+          inputType === "insertLineBreak" ||
+          (inputType === "insertText" && data === null)
+        ) {
+          const { value, selectionStart } = textarea;
+          controller.enqueue(
+            value.substring(
+              Math.max(0, value.lastIndexOf("\n", selectionStart - 2)),
+              value.length - 1
+            )
+          );
         }
-        const { done, value } = await prettifier.next(buffer);
-        if (done) throw new Error("cannot prettify");
-        output.innerHTML += value.data + "\n";
-        buffer = "";
-        break;
-    }
-  }
-})().catch(console.error);
+      },
+    })
+  )
+  .pipeThrough(prettify())
+  .pipeTo(
+    new WritableStream({
+      start() {
+        this.output = document.createElement("output");
+        document.body.append(this.output);
+      },
+      write(chunk) {
+        this.output.innerHTML += chunk + "\n";
+      },
+    })
+  );
