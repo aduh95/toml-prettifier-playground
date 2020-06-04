@@ -1,9 +1,10 @@
 import { fileURLToPath } from "url";
 import resolve from "@rollup/plugin-node-resolve";
+import cjs2esm from "./rollup-plugin-cjs2esm.mjs";
 import { rollup } from "rollup";
 
 let cache;
-const plugins = [resolve.default({ browser: true })];
+const plugins = [resolve.default({ browser: true }), cjs2esm()];
 
 async function buildWithCache(input) {
   const bundle = await rollup({
