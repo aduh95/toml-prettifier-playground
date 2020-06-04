@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node scripts/server.mjs"
+  },
   "dependencies": {
     "@aduh95/toml-prettifier": "^1.0.2",
     "highlight.js": "^10.0.3"
