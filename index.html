@@ -19,14 +19,27 @@
       href="node_modules/highlight.js/styles/darcula.css"
     />
     <style>
+      * {
+        height: 100%;
+        box-sizing: border-box;
+      }
       body {
         display: grid;
         grid-template-columns: 1fr 1fr;
         height: 100%;
         width: 100%;
+        max-width: 164ch;
+        margin: 0;
+        padding: 0;
       }
       output {
         white-space: pre;
+        font-family: monospace;
+        padding: 1ch;
+        width: 82ch;
+      }
+      textarea {
+        padding: 1ch;
       }
     </style>
   </head>
