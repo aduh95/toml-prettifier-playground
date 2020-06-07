@@ -77,7 +77,9 @@ new ReadableStream({
         document.body.append(this.output);
       },
       write(chunk) {
-        this.output.innerHTML += chunk + "\n";
+        const tpl = document.createElement("template");
+        tpl.innerHTML = chunk + "\n";
+        this.output.appendChild(tpl.content);
       },
     })
   );
