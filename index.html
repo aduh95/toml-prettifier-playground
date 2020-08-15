@@ -25,12 +25,17 @@
       }
       body {
         display: grid;
-        grid-template-columns: 1fr 1fr;
         height: 100%;
         width: 100%;
-        max-width: 164ch;
-        margin: 0;
+        margin: 0 auto;
         padding: 0;
+        max-width: 82ch;
+      }
+      @media screen and (min-width: 124ch) {
+        body {
+          grid-template-columns: 1fr 1fr;
+          max-width: 164ch;
+        }
       }
       output {
         white-space: pre;
